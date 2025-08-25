@@ -89,6 +89,23 @@ export default function PostJobPage() {
           )}
         </div>
 
+        {/* price */}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Job Price
+          </label>
+          <input
+            type="number"
+            name="price"
+            placeholder="e.g. 100000"
+            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {state?.errors?.price && (
+            <p className="text-red-500 text-sm">{state.errors.price[0]}</p>
+          )}
+        </div>
+
         {/* Skills */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -152,16 +169,6 @@ export default function PostJobPage() {
           {isPending ? "Posting..." : "Publish Job Posting"}
         </Button>
 
-        {/* General message */}
-        {/* {state?.message && (
-          <p
-            className={`text-center text-sm mt-2 ${
-              state.status ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {state.message}
-          </p>
-        )} */}
       </form>
     </div>
   );

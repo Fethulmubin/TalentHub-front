@@ -27,7 +27,7 @@ export default async function Home({ searchParams }: JobsPageProps) {
 
       <Suspense
         fallback={
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
             {Array.from({ length: 4 }).map((_, idx) => (
               <JobCardSkeleton key={idx} />
             ))}

@@ -8,4 +8,5 @@ export const JobSchema = z.object({
   skills: z
     .array(z.string().min(2, "Skill must be at least 2 characters"))
     .nonempty("At least one skill is required"),
+  price: z.number().min(0, "Price must be a positive number").optional(),
 });

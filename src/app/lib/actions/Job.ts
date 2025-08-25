@@ -9,7 +9,6 @@ interface GetJobsParams {
   skill?: string
 }
 
-
 export async function getJobs({ search, skill }: GetJobsParams): Promise<JobCardProps[]> {
   const params = new URLSearchParams();
 
@@ -33,6 +32,7 @@ export async function PostJob(prevState: any, formData: FormData) {
     title: formData.get("title"),
     description: formData.get("description"),
     skills: formData.getAll("skills") as string[], // multiple inputs named "skills"
+    price: formData.get("price") ? Number(formData.get("price")) : 0, // convert to number
   };
 
   // validate with Zod
@@ -56,8 +56,8 @@ export async function PostJob(prevState: any, formData: FormData) {
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      return { status: false, message: err.message || "Failed to post job" };
+        const err = await res.json();
+        return { status: false, message: err.message || "Failed to post job" };
     }
 
     const result = await res.json();
@@ -66,4 +66,28 @@ export async function PostJob(prevState: any, formData: FormData) {
     console.error("Post job error:", error);
     return { status: false, message: "Something went wrong" };
   }
+}
+
+export async function getJobById(jobId: string) {
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}`,{
+      method: "GET",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+       const err = await res.json();
+      return { status: false, message: err.message || "Failed to fetch job" };
+    }
+
+   const result = await res.json();
+  //  console.log(result)
+    return { status: true, message: "Job fetched successfully", job: result.job };
+  } catch (error) {
+     console.error("Post job error:", error);
+    return { status: false, message: "Something went wrong" };
+  }
+
 }
