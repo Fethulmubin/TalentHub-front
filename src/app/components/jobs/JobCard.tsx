@@ -2,9 +2,17 @@
 import { getJobs } from "../../lib/actions/Job";
 import { JobCardProps } from "@/types/Job";
 
-export default async function JobCard() {
+interface JobCardPropsWithFilters {
+  search?: string;
+  skill?: string;
+}
+export default async function JobCard({ search, skill }: JobCardPropsWithFilters) {
   
-  const jobs = await getJobs();
+  const jobs = await getJobs({ search, skill });
+
+  if (!jobs || jobs.length === 0) {
+    return <p className="text-center text-gray-500 mt-4">No jobs found.</p>;
+  }
 
 
   return (

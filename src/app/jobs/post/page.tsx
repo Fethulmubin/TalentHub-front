@@ -20,6 +20,7 @@ export default function PostJobPage() {
 
   // add skill
   const addSkill = () => {
+    // removing white space and checking if there is duplicate skills
     if (skillInput.trim() && !skills.includes(skillInput.trim())) {
       setSkills([...skills, skillInput.trim()]);
       setSkillInput("");

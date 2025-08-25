@@ -4,9 +4,18 @@ import { JobCardProps } from "@/types/Job";
 import { JobSchema } from "../validators/job";
 
 // fetching all jobs for the homepage
+interface GetJobsParams {
+  search?: string;
+  skill?: string
+}
 
-export async function getJobs(): Promise<JobCardProps[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`);
+
+export async function getJobs({ search, skill }: GetJobsParams): Promise<JobCardProps[]> {
+  const params = new URLSearchParams();
+
+  if (search) params.append("search", search);
+  if (skill) params.append("skill", skill);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch jobs");
