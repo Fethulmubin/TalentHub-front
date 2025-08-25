@@ -2,9 +2,11 @@
 
 import { JobCardProps } from "@/types/Job";
 
+// fetching all jobs for the homepage
+
 export async function getJobs(): Promise<JobCardProps[]> {
-  const res = await fetch("http://localhost:3500/jobs");
-  
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`);
+
   if (!res.ok) {
     throw new Error("Failed to fetch jobs");
   }
@@ -14,3 +16,5 @@ export async function getJobs(): Promise<JobCardProps[]> {
   // The API returns { status: true, jobs: [...] }, so return only jobs
   return data.jobs;
 }
+
+// adding 
