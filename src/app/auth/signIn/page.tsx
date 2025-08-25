@@ -19,8 +19,9 @@ export default function SignIn() {
   // redirecting after successful login
   useEffect(() => {
     if (state?.status === true) {
-      toast.success("Account created successfully!, Please verify your email");
-      router.push("/auth/verify");
+      toast.success("Logged in successfully!");
+      router.push("/");
+      router.refresh();
     } else if (state?.status === false && state?.message) {
       toast.error(state.message);
     }
@@ -40,7 +41,7 @@ export default function SignIn() {
           {/* Email */}
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <Mail size={18} />y
+              <Mail size={18} />
             </span>
             <input
               type="email"
@@ -71,10 +72,11 @@ export default function SignIn() {
 
           {/* Login Button */}
           <Button
+            disabled={isPending}
             type="submit"
             className="w-full py-3 mt-4 text-white bg-blue-600 hover:bg-blue-700"
           >
-            Login
+            {isPending ? 'Logging in...' : 'Login'}
           </Button>
 
           <p className="text-center text-sm text-gray-600">

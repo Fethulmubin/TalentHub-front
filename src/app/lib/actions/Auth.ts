@@ -101,7 +101,24 @@ export async function Verify(prevState: any, formData: FormData) {
   }
 }
 
-export async function Logout() {}
+export async function Logout() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return { status: false, message: err.message || "Logout failed" };
+    }
+
+    return { status: true, message: "Logged out successfully" };
+  } catch (error) {
+    console.log(error);
+    return { status: false, message: "Something went wrong, try again later" };
+  }
+}
 
 // export async function getCurrentUser() {
 //   const cookieStore = await cookies();
