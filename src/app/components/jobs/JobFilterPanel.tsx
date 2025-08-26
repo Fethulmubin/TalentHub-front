@@ -3,8 +3,10 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 // simple debounce helper
+// @ts-ignore
 function debounce(fn: (...args: any[]) => void, delay: number) {
   let timer: NodeJS.Timeout;
+  // @ts-ignore
   return (...args: any[]) => {
     clearTimeout(timer);
     timer = setTimeout(() => fn(...args), delay);

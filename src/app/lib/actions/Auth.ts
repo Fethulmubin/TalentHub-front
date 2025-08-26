@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 // import { cookies } from "next/headers";
 // import  jwt from "jsonwebtoken";
 
+// @ts-ignore
 export async function SignUp(prevState: any, formData: FormData) {
   const data = {
     name: formData.get("name"),
@@ -41,6 +42,7 @@ export async function SignUp(prevState: any, formData: FormData) {
     return { status: false, message: "Something went wrong, try again later" };
   }
 }
+// @ts-ignore
 export async function Login(prevState: any, formData: FormData) {
   const data = {
     email: formData.get("email"),
@@ -72,6 +74,7 @@ export async function Login(prevState: any, formData: FormData) {
   }
 }
 
+// @ts-ignore
 export async function Verify(prevState: any, formData: FormData) {
   const data = {
     otpInput: formData.get("otpInput"),

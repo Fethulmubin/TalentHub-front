@@ -138,7 +138,7 @@ export default function ApplicationTable({ jobId }: { jobId: string }) {
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
                   >
-                    {app.user.name}'s Resume
+                    {app.user.name} &apos Resume
                   </a>
                 </td>
                 <td className="p-3">

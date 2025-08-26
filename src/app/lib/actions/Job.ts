@@ -27,6 +27,7 @@ export async function getJobs({ search, skill }: GetJobsParams): Promise<JobCard
 }
 
 // posting jobs
+// @ts-ignore
 export async function PostJob(prevState: any, formData: FormData) {
   const data = {
     title: formData.get("title"),

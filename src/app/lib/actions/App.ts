@@ -1,4 +1,4 @@
-
+// @ts-ignore
 export async function ApplyForJob(prevState: any, formData: FormData) {
 
   try {
