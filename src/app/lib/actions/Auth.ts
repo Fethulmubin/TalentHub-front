@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { LoginSchema, SignUpSchema, VerifySchema } from "../validators/auth";
 import { headers } from "next/headers";
-import { cookies } from "next/headers";
+import Cookies from "js-cookie";
+
+// import { cookies } from "next/headers";
 // import  jwt from "jsonwebtoken";
 
 // @ts-ignore
@@ -36,6 +38,7 @@ export async function SignUp(prevState: any, formData: FormData) {
     }
     console.log(res);
 
+
     return { status: true, message: "Account created successfully" };
   } catch (error) {
     console.log(error);
@@ -61,26 +64,14 @@ export async function Login(prevState: any, formData: FormData) {
       credentials: "include",
     });
 
-    if (!res.ok) {
+    if(!res.ok) {
       const err = await res.json();
       return { status: false, message: err.message || "Login failed" };
     }
 
     const result = await res.json();
-    const cookieStore = await cookies();
-    cookieStore.set({
-      name: "token",
-      value: result.token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      sameSite: "lax", // you can use "lax" because now it's same-site
-    });
-    return {
-      status: true,
-      message: "Logged in successfully",
-      user: result.user,
-    };
+    Cookies.set("token", result.token, { path: "/" });
+    return { status: true, message: "Logged in successfully", user: result.user };
   } catch (error) {
     console.log(error);
     return { status: false, message: "Something went wrong, try again later" };
@@ -96,6 +87,7 @@ export async function Verify(prevState: any, formData: FormData) {
   if (!parsed.success) {
     return { status: false, errors: parsed.error.flatten().fieldErrors };
   }
+  
 
   // call backend API
   try {
@@ -112,20 +104,8 @@ export async function Verify(prevState: any, formData: FormData) {
     }
 
     const result = await res.json();
-    const cookieStore = await cookies();
-    cookieStore.set({
-      name: "token",
-      value: result.token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      sameSite: "lax", // you can use "lax" because now it's same-site
-    });
-    return {
-      status: true,
-      message: "Email verified successfully",
-      user: result.user,
-    };
+    Cookies.set("token", result.token, { path: "/" });
+    return { status: true, message: "Email verified successfully", user: result.user };
   } catch {
     return { status: false, message: "Something went wrong, try again later" };
   }
@@ -149,3 +129,4 @@ export async function Logout() {
     return { status: false, message: "Something went wrong, try again later" };
   }
 }
+
