@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/app/context/AuthContext";
 import { Login } from "@/app/lib/actions/Auth";
 import { Button } from "@/components/ui/button";
 import { Lock, Mail } from "lucide-react";
@@ -9,6 +10,7 @@ import { toast } from "sonner";
 
 export default function SignIn() {
   const router = useRouter();
+    const { setUser, fetchUser } = useAuth();
 
   // Server action state
   const [state, action, isPending] = useActionState(Login, {
@@ -21,6 +23,8 @@ export default function SignIn() {
     if (state?.status === true) {
       router.refresh();
       toast.success("Logged in successfully!");
+      // setting user to context
+      setUser(state.user);
       if (state.user.role === "EMPLOYER") {
         router.push(`/admin/${state.user?.id}`);
       }

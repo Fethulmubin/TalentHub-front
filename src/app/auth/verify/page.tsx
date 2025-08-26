@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/app/context/AuthContext";
 import { Verify } from "@/app/lib/actions/Auth";
 import { Button } from "@/components/ui/button";
 import { Lock, Mail, MailCheck } from "lucide-react";
@@ -6,9 +7,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { set } from "zod";
 
 export default function VerifyPage() {
   const router = useRouter();
+   const { setUser, fetchUser } = useAuth();
+
   // Server action state
   const [state, action, isPending] = useActionState(Verify, {
     status: false,
@@ -20,6 +24,7 @@ export default function VerifyPage() {
     if (state?.status === true) {
       router.refresh();
       toast.success("Email verified successfully!");
+      setUser(state.user);
       if (state.user.role === "EMPLOYER") {
         router.push(`/admin/${state.user.id}`);
       }
