@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Verify } from "@/app/lib/actions/Auth";
 import { Button } from "@/components/ui/button";
 import { Lock, Mail, MailCheck } from "lucide-react";
@@ -7,26 +7,29 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
-
 export default function VerifyPage() {
-    const router = useRouter();
+  const router = useRouter();
   // Server action state
   const [state, action, isPending] = useActionState(Verify, {
     status: false,
     errors: {},
     message: undefined,
-
   });
 
-  useEffect(()=> {
+  useEffect(() => {
     if (state?.status === true) {
-     toast.success("Email verified successfully!");
-      router.push('/')
-    }
-     else if (state?.status === false && state?.message) {
+      router.refresh();
+      toast.success("Email verified successfully!");
+      if (state.user.role === "EMPLOYER") {
+        router.push(`/admin/${state.user.id}`);
+      }
+      if (state.user.role === "APPLICANT") {
+        router.push("/");
+      }
+    } else if (state?.status === false && state?.message) {
       toast.error(state.message);
     }
-  },[state, router])
+  }, [state, router]);
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50 p-6">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-3">

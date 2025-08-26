@@ -1,7 +1,7 @@
 // app/job/page.tsx
 import ApplyForm from "@/app/components/jobs/ApplyForm";
 import { getJobById } from "@/app/lib/actions/Job";
-import { MapPin, Briefcase, Building2 } from "lucide-react";
+import {  Building2 } from "lucide-react";
 
 
 export default async function JobPage({ params }: {params: Promise<{ jobId: string }>}) {

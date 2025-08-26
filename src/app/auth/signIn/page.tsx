@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Login } from "@/app/lib/actions/Auth";
 import { Button } from "@/components/ui/button";
 import { Lock, Mail } from "lucide-react";
@@ -19,9 +19,14 @@ export default function SignIn() {
   // redirecting after successful login
   useEffect(() => {
     if (state?.status === true) {
-      toast.success("Logged in successfully!");
-      router.push("/");
       router.refresh();
+      toast.success("Logged in successfully!");
+      if (state.user.role === "EMPLOYER") {
+        router.push(`/admin/${state.user?.id}`);
+      }
+      if (state.user.role === "APPLICANT") {
+        router.push("/");
+      }
     } else if (state?.status === false && state?.message) {
       toast.error(state.message);
     }
@@ -50,7 +55,9 @@ export default function SignIn() {
               className="w-full pl-10 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {state?.errors?.email && (
-              <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {state.errors.email[0]}
+              </p>
             )}
           </div>
 
@@ -66,7 +73,9 @@ export default function SignIn() {
               className="w-full pl-10 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {state.errors?.password && (
-              <p className="text-red-500 text-sm mt-1">{state.errors.password[0]}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {state.errors.password[0]}
+              </p>
             )}
           </div>
 
@@ -76,7 +85,7 @@ export default function SignIn() {
             type="submit"
             className="w-full py-3 mt-4 text-white bg-blue-600 hover:bg-blue-700"
           >
-            {isPending ? 'Logging in...' : 'Login'}
+            {isPending ? "Logging in..." : "Login"}
           </Button>
 
           <p className="text-center text-sm text-gray-600">

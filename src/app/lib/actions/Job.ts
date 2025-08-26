@@ -91,3 +91,24 @@ export async function getJobById(jobId: string) {
   }
 
 }
+
+export async function getJobByUserId(userId: string){
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/user/${userId}`,{
+      method: "GET",
+      headers: {"Content-Type": "application/json"},
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return { status: false, message: err.message || "Failed to fetch jobs" };
+    }
+
+    const result = await res.json();
+    return { status: true, message: "Jobs fetched successfully", jobs: result.jobs };
+  } catch (error) {
+    console.error("Get jobs by user ID error:", error);
+    return { status: false, message: "Something went wrong" };
+  }
+}

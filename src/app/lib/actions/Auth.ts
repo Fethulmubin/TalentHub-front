@@ -64,7 +64,8 @@ export async function Login(prevState: any, formData: FormData) {
       return { status: false, message: err.message || "Login failed" };
     }
 
-    return { status: true, message: "Logged in successfully" };
+    const result = await res.json();
+    return { status: true, message: "Logged in successfully", user: result.user };
   } catch (error) {
     console.log(error);
     return { status: false, message: "Something went wrong, try again later" };
@@ -95,7 +96,8 @@ export async function Verify(prevState: any, formData: FormData) {
       return { status: false, message: err.message || "Verification failed" };
     }
 
-    return { status: true, message: "Email verified successfully" };
+    const result = await res.json();
+    return { status: true, message: "Email verified successfully", user: result.user };
   } catch {
     return { status: false, message: "Something went wrong, try again later" };
   }
@@ -120,29 +122,3 @@ export async function Logout() {
   }
 }
 
-// export async function getCurrentUser() {
-//   const cookieStore = await cookies();
-//   // console.log("Server cookies:", cookieStore.getAll());
-//   const token = cookieStore.get("token")?.value;
-//   // console.log(token)
-
-//   if(!token) return null;
-
-//   try {
-//     // 🔑 verify token with your JWT secret
-//     const decoded = jwt.verify(token, process.env.NEXT_PUBLIC_JWT_SECRET as string) as {
-//       id: string;
-//       email: string;
-//       role: string;
-//     };
-
-//     return {
-//       id: decoded.id,
-//       email: decoded.email,
-//       role: decoded.role,
-//     };
-//   } catch (err) {
-//     console.error("Invalid token:", err);
-//     return null;
-//   }
-// }

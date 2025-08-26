@@ -42,3 +42,24 @@ export async function getAppById(userId: string) {
     return { status: false, message: "Something went wrong" };
   }
 }
+
+// getting application by job id
+export async function getAppByJobId(jobId: string) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/job/${jobId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      return { status: false, message: errorData.message || "Failed to Fetch Application" };
+    }
+
+    const result = await res.json();
+    return { status: true, app: result.applications };
+  } catch (error) {
+    console.error("Get application error:", error);
+    return { status: false, message: "Something went wrong" };
+  }
+}
