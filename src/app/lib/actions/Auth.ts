@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { LoginSchema, SignUpSchema, VerifySchema } from "../validators/auth";
 import { headers } from "next/headers";
-// import { cookies } from "next/headers";
+import { cookies } from "next/headers";
 // import  jwt from "jsonwebtoken";
 
 // @ts-ignore
@@ -67,6 +67,8 @@ export async function Login(prevState: any, formData: FormData) {
     }
 
     const result = await res.json();
+    const cookieStore = await cookies()
+    cookieStore.set("token", result.token, { path: "/" })
     return { status: true, message: "Logged in successfully", user: result.user };
   } catch (error) {
     console.log(error);
@@ -100,6 +102,8 @@ export async function Verify(prevState: any, formData: FormData) {
     }
 
     const result = await res.json();
+    const cookieStore = await cookies()
+    cookieStore.set("token", result.token, { path: "/" })
     return { status: true, message: "Email verified successfully", user: result.user };
   } catch {
     return { status: false, message: "Something went wrong, try again later" };
