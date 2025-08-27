@@ -123,6 +123,7 @@ export async function Logout() {
       return { status: false, message: err.message || "Logout failed" };
     }
 
+    Cookies.remove("token", { path: "/" });
     return { status: true, message: "Logged out successfully" };
   } catch (error) {
     console.log(error);
