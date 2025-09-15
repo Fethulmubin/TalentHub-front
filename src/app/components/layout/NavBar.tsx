@@ -1,18 +1,21 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User } from "lucide-react";
+import { Menu, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import { Logout } from "@/app/lib/actions/Auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function NavBar() {
   const { user, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -31,6 +34,17 @@ export default function NavBar() {
       setLoading(false);
     }
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -96,27 +110,42 @@ export default function NavBar() {
             aria-expanded="false"
           >
             <span className="sr-only">Open main menu</span>
-            <Menu size={20} className="sm:size-6" />
+            <Menu size={20} />
           </button>
         </div>
       </nav>
 
-      {/* Mobile Bottom Bar */}
+      {/* Mobile Dropdown Bottom Bar */}
       {user && (
-        <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center p-3 md:hidden z-30">
-          <span className="text-gray-800 dark:text-gray-200 font-medium truncate max-w-[100px]">
-            {user.email.split("@")[0]}
-          </span>
-          <Button
-            disabled={loading}
-            onClick={handleLogout}
-            className="bg-red-400 hover:bg-red-500 text-white text-sm px-3"
-          >
-            {loading ? "..." : "Logout"}
-          </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3">
-            <Link href={`/apps/${user.id}`}>Track Apps</Link>
-          </Button>
+        <div className="fixed bottom-0 left-0 w-full flex justify-end md:hidden z-30 p-2 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+          <div className="relative" ref={dropdownRef}>
+            <Button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            >
+              <User className="w-4 h-4" />
+              <span className="truncate max-w-[80px]">{user.email.split("@")[0]}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+            </Button>
+
+            {dropdownOpen && (
+              <div className="absolute bottom-full mb-2 right-0 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                <button
+                  onClick={handleLogout}
+                  disabled={loading}
+                  className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-gray-700"
+                >
+                  {loading ? "Logging out..." : "Logout"}
+                </button>
+                <Link
+                  href={`/apps/${user.id}`}
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  Track Apps
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>
