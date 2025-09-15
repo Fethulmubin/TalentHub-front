@@ -16,7 +16,7 @@ export default function Sidebar({ userId }: { userId: string }) {
   return (
     <>
       {/* Sidebar for large screens */}
-      <aside className="hidden md:flex md:flex-col w-64 bg-white shadow-lg">
+      <aside className="hidden md:flex md:flex-col w-64 bg-white shadow-lg flex-shrink-0">
         <div className="p-6 text-2xl font-bold text-indigo-600">TalentHub Admin</div>
         <nav className="flex-1 space-y-2 px-4">
           {menuItems.map(({ name, href, icon: Icon }) => (
@@ -43,7 +43,7 @@ export default function Sidebar({ userId }: { userId: string }) {
 
         {sidebarOpen && (
           <div className="fixed inset-0 z-50 flex">
-            <div className="w-64 bg-white shadow-lg p-6 space-y-4">
+            <div className="w-64 bg-white shadow-lg p-6 space-y-4 overflow-y-auto">
               <div className="text-xl font-bold text-indigo-600 mb-6">
                 TalentHub Admin
               </div>
