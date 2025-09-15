@@ -36,6 +36,12 @@ export default function JobRow({ userId }: { userId: string }) {
     };
     fetchUser();
   }, [userId]);
+
+   // This triggers Suspense until applications is set
+  if (applications === null) {
+    throw new Promise(() => {});
+  }
+  
   return (
     <>
       {applications ? applications.map((app) => (
