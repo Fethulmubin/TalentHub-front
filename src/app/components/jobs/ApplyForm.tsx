@@ -1,14 +1,17 @@
 "use client";
+
 import { useActionState, useEffect, useState } from "react";
 import { Upload, Plus, FileIcon, X } from "lucide-react";
 import { ApplyForJob } from "@/app/lib/actions/App";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useMediaQuery } from "react-responsive";
 
 export default function ApplyForm({ jobId }: { jobId: string }) {
   const [skills, setSkills] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const isMobile = useMediaQuery({maxWidth: 640});
 
   const handleAddSkill = () => {
     if (input.trim() && !skills.includes(input.trim())) {
@@ -32,25 +35,26 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
     message: undefined,
   });
 
-   useEffect(() => {
-      if (state?.status === true) {
-        toast.success("Application Submitted successfully!");
-      }
-      else if (state?.status === false && state?.message) {
-        toast.error(state.message);
-      }
-    }, [state]);
+  useEffect(() => {
+    if (state?.status === true) {
+      toast.success("Application Submitted successfully!");
+    } else if (state?.status === false && state?.message) {
+      toast.error(state.message);
+    }
+  }, [state]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-6">
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4 sm:p-6">
       <form
         action={action}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl"
+        className={`bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full ${
+          isMobile ? "max-w-full" : "max-w-2xl"
+        }`}
       >
         <h1 className="text-2xl font-bold text-center mb-2">
           Apply for Position
         </h1>
-        <p className="text-gray-500 text-center mb-8">
+        <p className="text-gray-500 text-center mb-6 sm:mb-8">
           Join our team of talented developers. Upload your resume and showcase
           your skills.
         </p>
@@ -58,14 +62,12 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
         {/* Resume Upload */}
         <div className="mb-6">
           <h2 className="font-semibold mb-2">Resume Upload</h2>
-          <label className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition flex flex-col items-center">
-            <Upload className="mb-3 text-blue-500" size={32} />
-            <p className="text-gray-600">
+          <label className="border-2 border-dashed rounded-xl p-4 sm:p-6 text-center cursor-pointer hover:border-blue-400 transition flex flex-col items-center">
+            <Upload className="mb-2 sm:mb-3 text-blue-500" size={32} />
+            <p className="text-gray-600 text-sm sm:text-base">
               Drop your resume here or click to browse
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Only PDF Supported (up to 5MB)
-            </p>
+            <p className="text-xs text-gray-400 mt-1">Only PDF (up to 5MB)</p>
             <input
               type="file"
               name="resume"
@@ -88,11 +90,11 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
           )}
         </div>
 
-        {/* Technical Skills */}
+        {/* Skills Input */}
         <div className="mb-6">
           <h2 className="font-semibold mb-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-500"></span>{" "}
-            Technical Skills
+            <span className="w-2 h-2 rounded-full bg-purple-500"></span> Technical
+            Skills
           </h2>
           <div className="flex flex-wrap gap-2 mb-3">
             {skills.map((skill) => (
@@ -112,7 +114,7 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={input}
@@ -129,17 +131,12 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
             <button
               type="button"
               onClick={handleAddSkill}
-              className="bg-blue-500 text-white px-4 rounded-xl flex items-center gap-1 hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-4 py-2 rounded-xl flex items-center gap-1 hover:bg-blue-600 transition"
             >
-              <Plus size={16} />
+              <Plus size={16} /> Add
             </button>
           </div>
         </div>
-
-        {/* Hidden skills input */}
-        {/* {skills.map((skill, i) => (
-          <input key={i} type="hidden" name="skills" value={skill} />
-        ))} */}
 
         {/* Submit */}
         <Button
