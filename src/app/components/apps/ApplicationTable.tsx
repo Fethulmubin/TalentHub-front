@@ -116,7 +116,11 @@ export default function ApplicationTable({ jobId }: { jobId: string }) {
         </thead>
         <tbody>
           {loading ? (
-           <JobRowSkeleton />
+            <>
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <JobRowSkeleton key={idx} />
+              ))}
+            </>
           ) : applications ? (
             applications.map((app) => (
               <tr
@@ -146,7 +150,19 @@ export default function ApplicationTable({ jobId }: { jobId: string }) {
                 </td>
                 <td className="p-3">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${app.status === "APPLIED" ? 'bg-green-400/20' : app.status === "SHORTLISTED" ? 'bg-blue-400/20' : 'bg-red-400/20'} ${app.status === "APPLIED" ? 'text-green-700' : app.status === "SHORTLISTED" ? 'text-blue-700' : 'text-red-700'}`}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      app.status === "APPLIED"
+                        ? "bg-green-400/20"
+                        : app.status === "SHORTLISTED"
+                        ? "bg-blue-400/20"
+                        : "bg-red-400/20"
+                    } ${
+                      app.status === "APPLIED"
+                        ? "text-green-700"
+                        : app.status === "SHORTLISTED"
+                        ? "text-blue-700"
+                        : "text-red-700"
+                    }`}
                   >
                     {app.status}
                   </span>

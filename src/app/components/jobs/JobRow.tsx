@@ -2,9 +2,8 @@
 
 import { getAppById } from "@/app/lib/actions/App";
 import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import JobRowSkeleton from "../ui/JobRowSkeleton";
-
 
 type JobRowProps = {
   id: string;
@@ -12,15 +11,13 @@ type JobRowProps = {
     title: string;
     createdAt: string;
     createdBy: {
-        name: string;
-    }
+      name: string;
+    };
     price?: string;
   };
   status: string;
   createdAt: string;
-
 }[];
-
 
 export default function JobRow({ userId }: { userId: string }) {
   const [applications, setApplications] = useState<JobRowProps>([]);
@@ -34,7 +31,7 @@ export default function JobRow({ userId }: { userId: string }) {
         setApplications(res.app);
         setLoading(false);
 
-        console.log(res.app)
+        console.log(res.app);
       } else {
         console.error("Error fetching application:", res.message);
       }
@@ -42,30 +39,45 @@ export default function JobRow({ userId }: { userId: string }) {
     fetchUser();
   }, [userId]);
 
-  
   return (
     <>
       {loading ? (
-        <JobRowSkeleton />
-      ) : applications.length > 0 ? applications.map((app) => (
-        <tr key={app.id} className="border-b last:border-none">
-          <td className="px-6 py-4">
-            <div className="font-medium">{app.job.title}</div>
-            <div className="text-sm text-gray-500">
-              {app.job.createdBy.name}
-            </div>
-          </td>
-          <td className="px-6 py-4">
-            <span
-              className={`px-3 py-1 rounded-full text-sm font-medium ${app.status === "SHORTLISTED" ? "bg-green-100 text-green-700" :  app.status === "APPLIED" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}
-            >
-              {app.status}
-            </span>
-          </td>
-          <td className="px-6 py-4 text-gray-600">{dayjs(app.createdAt).format("MMM DD, YYYY")}</td>
-          <td className="px-6 py-4 font-semibold">{app.job.price || "N/A"}</td>
-        </tr>
-      )): (
+        <>
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <JobRowSkeleton key={idx} />
+          ))}
+        </>
+      ) : applications.length > 0 ? (
+        applications.map((app) => (
+          <tr key={app.id} className="border-b last:border-none">
+            <td className="px-6 py-4">
+              <div className="font-medium">{app.job.title}</div>
+              <div className="text-sm text-gray-500">
+                {app.job.createdBy.name}
+              </div>
+            </td>
+            <td className="px-6 py-4">
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  app.status === "SHORTLISTED"
+                    ? "bg-green-100 text-green-700"
+                    : app.status === "APPLIED"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {app.status}
+              </span>
+            </td>
+            <td className="px-6 py-4 text-gray-600">
+              {dayjs(app.createdAt).format("MMM DD, YYYY")}
+            </td>
+            <td className="px-6 py-4 font-semibold">
+              {app.job.price || "N/A"}
+            </td>
+          </tr>
+        ))
+      ) : (
         <tr>
           <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
             No applications found.
