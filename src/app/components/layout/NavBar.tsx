@@ -37,9 +37,9 @@ export default function NavBar() {
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Image src="https://flowbite.com/docs/images/logo.svg" width={32} height={32} alt="Flowbite Logo" />
+          <Image src="/talent.png" width={32} height={32} alt="TalentHub Logo" />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            Flowbite
+            TalentHub
           </span>
         </Link>
 
