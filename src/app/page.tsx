@@ -26,7 +26,7 @@ export default async function Home({ searchParams }: JobsPageProps) {
       </div>
 
       {/* Filter Panel */}
-      <div className="mb-6">
+      <div className="mb-6 mx-auto ">
         <JobFilterPanel />
       </div>
 
