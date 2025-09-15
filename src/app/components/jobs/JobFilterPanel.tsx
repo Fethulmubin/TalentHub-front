@@ -28,7 +28,7 @@ export default function JobFilterPanel() {
     if (skill) params.set("skill", skill);
 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, 250); // 250ms delay
+  }, 250);
 
   // watch input changes
   useEffect(() => {
@@ -36,19 +36,21 @@ export default function JobFilterPanel() {
   }, [search, skill]);
 
   return (
-    <div className="mb-4 flex gap-2">
+    <div className="mb-4 flex flex-col sm:flex-row gap-3 sm:gap-4">
+      {/* Search Input */}
       <input
         type="text"
         placeholder="Search jobs..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="border p-2 rounded flex-1"
+        className="border border-gray-300 p-2 rounded w-full sm:flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
+      {/* Skill Select */}
       <select
         value={skill}
         onChange={(e) => setSkill(e.target.value)}
-        className="border p-2 rounded flex-1"
+        className="border border-gray-300 p-2 rounded w-full sm:flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="">All Skills</option>
         <option value="React">React</option>
