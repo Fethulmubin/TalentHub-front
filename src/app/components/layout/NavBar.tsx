@@ -58,6 +58,9 @@ export default function NavBar() {
               >
                 {loading ? "Logging out..." : "Logout"}
               </Button>
+              <Button>
+                <Link href={`/apps/${user.id}`}>Track your Apps</Link>
+              </Button>
             </div>
           ) : (
             <Link
