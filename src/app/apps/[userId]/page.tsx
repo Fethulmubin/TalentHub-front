@@ -2,8 +2,6 @@
 // import { applications } from "@/data/applications";
 
 import JobRow from "@/app/components/jobs/JobRow";
-import JobRowSkeleton from "@/app/components/ui/JobRowSkeleton";
-import { Suspense } from "react";
 
 export default async function ApplicationsPage({params}: {params: Promise<{ userId: string }>}) {
     const { userId } = await params
@@ -25,17 +23,8 @@ export default async function ApplicationsPage({params}: {params: Promise<{ user
             </tr>
           </thead>
           <tbody>
-            <Suspense
-              fallback={
-                <>
-                {Array.from({ length: 4 }).map((_, idx) => (
-                  <JobRowSkeleton key={idx} />
-                ))}
-              </>
-              }
-            >
+           
               <JobRow userId={userId} />
-            </Suspense>
           </tbody>
         </table>
       </div>

@@ -3,6 +3,7 @@
 import { getAppById } from "@/app/lib/actions/App";
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
+import JobRowSkeleton from "../ui/JobRowSkeleton";
 
 
 type JobRowProps = {
@@ -23,12 +24,16 @@ type JobRowProps = {
 
 export default function JobRow({ userId }: { userId: string }) {
   const [applications, setApplications] = useState<JobRowProps>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true);
       const res = await getAppById(userId);
       if (res.status) {
         // If successful, you can use the application data
         setApplications(res.app);
+        setLoading(false);
+
         console.log(res.app)
       } else {
         console.error("Error fetching application:", res.message);
@@ -37,14 +42,12 @@ export default function JobRow({ userId }: { userId: string }) {
     fetchUser();
   }, [userId]);
 
-   // This triggers Suspense until applications is set
-  if (applications === null) {
-    throw new Promise(() => {});
-  }
   
   return (
     <>
-      {applications ? applications.map((app) => (
+      {loading ? (
+        <JobRowSkeleton />
+      ) : applications.length > 0 ? applications.map((app) => (
         <tr key={app.id} className="border-b last:border-none">
           <td className="px-6 py-4">
             <div className="font-medium">{app.job.title}</div>
