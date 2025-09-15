@@ -58,7 +58,7 @@ export default function NavBar() {
               >
                 {loading ? "Logging out..." : "Logout"}
               </Button>
-              <Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Link href={`/apps/${user.id}`}>Track your Apps</Link>
               </Button>
             </div>
