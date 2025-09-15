@@ -22,7 +22,7 @@ export default async function JobPage({ params }: {params: Promise<{ jobId: stri
       <h2 className="text-lg font-semibold mb-2">Required Skills:</h2>
       <div className="flex items-center gap-6 text-gray-500 text-sm mb-4">
         {job?.skills.map((skill : { id: string; name: string }) => (
-          <span key={skill.id} className="flex items-center justify-center rounded-3xl bg-green-400/20 p-1 w-15 text-xs gap-1">
+          <span key={skill.id}  className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
             {skill.name}
           </span>
         ))}
