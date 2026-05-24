@@ -1,56 +1,35 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/system/toaster";
 import NavBar from "./components/layout/NavBar";
+import CommandBar from "./components/layout/CommandBar";
+import BottomNav from "./components/layout/BottomNav";
 import { AuthProvider } from "./context/AuthContext";
+import { PageTransition } from "@/components/system/page-transition";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-// app/layout.tsx
 export const metadata: Metadata = {
-  title: "TalentHub - Mini Job Portal",
-  description: "TalentHub is a modern mini job portal to apply, track, and manage job applications with ease.",
+  title: {
+    default: "TalentHub — AI-Powered Recruiting",
+    template: "%s — TalentHub",
+  },
+  description:
+    "TalentHub is an AI-powered recruiting platform that helps companies find, evaluate, and hire top talent with resume intelligence and semantic search.",
   icons: {
     icon: [
-      { url: "/talent.png", sizes: "32x32", type: "image/png" }, // browser tab
-      { url: "/talent.png", sizes: "192x192", type: "image/png" }, // android / chrome apps
+      { url: "/talent.png", sizes: "32x32", type: "image/png" },
+      { url: "/talent.png", sizes: "192x192", type: "image/png" },
     ],
     apple: [
-      { url: "/talent.png", sizes: "180x180", type: "image/png" }, // iOS
+      { url: "/talent.png", sizes: "180x180", type: "image/png" },
     ],
-  },
-  openGraph: {
-    title: "TalentHub - Mini Job Portal",
-    description: "Find and apply for jobs easily with TalentHub.",
-    url: "https://talent-hub-front-cckb.vercel.app/",
-    siteName: "TalentHub",
-    images: [
-      {
-        url: "/talent.png",
-        width: 1200,
-        height: 630,
-        alt: "TalentHub Logo",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "TalentHub - Mini Job Portal",
-    description: "Apply, track, and manage jobs with ease using TalentHub.",
-    images: ["/talent.png"],
   },
 };
-
 
 export default function RootLayout({
   children,
@@ -58,14 +37,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased pt-15`}
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} bg-surface text-foreground pt-14 pb-16 md:pb-0 w-screen overflow-x-hidden font-sans`}>
         <AuthProvider>
           <NavBar />
-          {children}
-          <Toaster richColors position="top-right" />
+          <CommandBar />
+          <PageTransition>{children}</PageTransition>
+          <BottomNav />
+          <Toaster />
         </AuthProvider>
       </body>
     </html>
