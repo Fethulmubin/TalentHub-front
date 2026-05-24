@@ -1,105 +1,75 @@
 "use client";
 import { useAuth } from "@/app/context/AuthContext";
 import { Login } from "@/app/lib/actions/Auth";
-import { Button } from "@/components/ui/button";
-import { Lock, Mail } from "lucide-react";
+import { Button } from "@/components/system/button";
+import { Input } from "@/components/system/input";
+import { Lock, Mail, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { AuthShell } from "@/components/layout/auth-shell";
 
 export default function SignIn() {
   const router = useRouter();
-    const { setUser, fetchUser } = useAuth();
+  const { setUser } = useAuth();
 
-  // Server action state
   const [state, action, isPending] = useActionState(Login, {
     status: false,
     errors: {},
     message: undefined,
   });
-  // redirecting after successful login
+
   useEffect(() => {
     if (state?.status === true) {
-      router.refresh();
       toast.success("Logged in successfully!");
-      // setting user to context
       setUser(state.user);
+      router.refresh();
       if (state.user.role === "EMPLOYER") {
-        router.push(`/admin/${state.user?.id}`);
-      }
-      if (state.user.role === "APPLICANT") {
+        router.push(`/admin/${state.user.id}`);
+      } else {
         router.push("/");
       }
     } else if (state?.status === false && state?.message) {
       toast.error(state.message);
     }
-  }, [state, router]);
+  }, [state, router, setUser]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-6">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
-          Welcome Again,
-        </h1>
-        <p className="text-gray-600 text-center mb-6 text-sm">
-          Join TalentHub and find your dream opportunities
-        </p>
+    <AuthShell title="Welcome back" description="Sign in to your account">
+      <form action={action} className="space-y-4">
+        <Input
+          type="email"
+          name="email"
+          placeholder="Email address"
+          leftIcon={<Mail size={14} />}
+          error={state?.errors?.email?.[0]}
+        />
 
-        <form action={action} className="space-y-4 flex flex-col">
-          {/* Email */}
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <Mail size={18} />
-            </span>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email address"
-              className="w-full pl-10 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {state?.errors?.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {state.errors.email[0]}
-              </p>
-            )}
-          </div>
+        <Input
+          type="password"
+          name="password"
+          placeholder="Password"
+          leftIcon={<Lock size={14} />}
+          error={state?.errors?.password?.[0]}
+        />
 
-          {/* Password */}
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <Lock size={18} />
-            </span>
-            <input
-              type="password"
-              name="password"
-              placeholder="Create a strong password"
-              className="w-full pl-10 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {state.errors?.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {state.errors.password[0]}
-              </p>
-            )}
-          </div>
+        {state?.status === false && !state.errors && (
+          <p className="text-xs text-destructive">{state.message}</p>
+        )}
 
-          {/* Login Button */}
-          <Button
-            disabled={isPending}
-            type="submit"
-            className="w-full py-3 mt-4 text-white bg-blue-600 hover:bg-blue-700"
-          >
-            {isPending ? "Logging in..." : "Login"}
-          </Button>
+        <Button type="submit" className="w-full" loading={isPending}>
+          {isPending ? "Signing in..." : "Sign In"}
+          {!isPending && <ArrowRight size={14} />}
+        </Button>
+      </form>
 
-          <p className="text-center text-sm text-gray-600">
-            No Account yet?{" "}
-            <Link href="/signup" className="text-blue-600 font-semibold">
-              Create one
-            </Link>
-          </p>
-        </form>
-      </div>
-    </div>
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        No account yet?{" "}
+        <Link href="/auth/signup" className="font-medium text-accent hover:text-accent/80 transition-colors">
+          Create one
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

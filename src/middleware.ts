@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
@@ -6,7 +5,12 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/auth/signIn", req.url));
+    const protectedPaths = ["/admin", "/apps", "/jobs", "/resume", "/candidates"];
+    const isProtected = protectedPaths.some((p) => req.nextUrl.pathname.startsWith(p));
+    if (isProtected) {
+      return NextResponse.redirect(new URL("/auth/signIn", req.url));
+    }
+    return NextResponse.next();
   }
 
   try {
@@ -15,7 +19,6 @@ export async function middleware(req: NextRequest) {
 
     const pathname = req.nextUrl.pathname;
 
-    // Route-specific role checks
     if (pathname.startsWith("/admin") && payload.role !== "EMPLOYER") {
       return NextResponse.redirect(new URL("/auth/signIn", req.url));
     }
@@ -24,7 +27,10 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/auth/signIn", req.url));
     }
 
-  } catch (err) {
+    if (pathname.startsWith("/candidates") && payload.role !== "EMPLOYER") {
+      return NextResponse.redirect(new URL("/auth/signIn", req.url));
+    }
+  } catch {
     return NextResponse.redirect(new URL("/auth/signIn", req.url));
   }
 
@@ -32,5 +38,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/apps/:path*", "/jobs/:path*"],
+  matcher: ["/admin/:path*", "/apps/:path*", "/jobs/:path*", "/resume/:path*", "/candidates/:path*"],
 };
