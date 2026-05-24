@@ -1,4 +1,6 @@
 import Sidebar from "@/app/components/layout/SideBar";
+import { AdminBreadcrumbs } from "./breadcrumbs";
+import { DashboardShell } from "@/components/layout/dashboard-shell";
 
 export default async function AdminLayout({
   children,
@@ -10,12 +12,12 @@ export default async function AdminLayout({
   const { userId } = await params;
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
-      {/* Sidebar */}
+    <div className="flex w-full h-[calc(100vh-3.5rem)]">
       <Sidebar userId={userId} />
-
-      {/* Main content */}
-      <main className="flex-1 p-4 sm:p-6 md:p-6 lg:p-8 overflow-y-auto">{children}</main>
+      <DashboardShell>
+        <AdminBreadcrumbs userId={userId} />
+        <div className="mt-4">{children}</div>
+      </DashboardShell>
     </div>
   );
 }
