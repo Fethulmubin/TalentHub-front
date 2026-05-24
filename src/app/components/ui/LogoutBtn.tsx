@@ -1,7 +1,7 @@
 "use client";
 
 import { Logout } from "@/app/lib/actions/Auth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/system/button";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,25 +11,21 @@ export default function LogoutBtn() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const res = await Logout(); // your API call
+      const res = await Logout();
       if (res?.status) {
         toast.success(res.message || "Logged out successfully!");
       } else {
         toast.error(res?.message || "Failed to logout");
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Something went wrong!");
     } finally {
       setLoading(false);
     }
   };
+
   return (
-    <Button
-      disabled={loading}
-      onClick={handleLogout}
-      className="bg-red-400 hover:bg-red-500 text-white"
-    >
+    <Button disabled={loading} loading={loading} onClick={handleLogout} variant="destructive" size="sm">
       {loading ? "Logging out..." : "Logout"}
     </Button>
   );
