@@ -32,14 +32,12 @@ export async function SignUp(prevState: any, formData: FormData) {
       }
     );
 
+    const data = await res.json();
     if (!res.ok) {
-      const err = await res.json();
-      return { status: false, message: err.message || "Signup failed" };
+      return { status: false, message: data.message || "Signup failed" };
     }
-    console.log(res);
 
-
-    return { status: true, message: "Account created successfully" };
+    return { status: true, message: data.message, otp: data.otp };
   } catch (error) {
     console.log(error);
     return { status: false, message: "Something went wrong, try again later" };
