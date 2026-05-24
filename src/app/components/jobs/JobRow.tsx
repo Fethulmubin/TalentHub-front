@@ -3,87 +3,81 @@
 import { getAppById } from "@/app/lib/actions/App";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import JobRowSkeleton from "../ui/JobRowSkeleton";
+import { Badge } from "@/components/system/badge";
 
-type JobRowProps = {
+type Application = {
   id: string;
   job: {
     title: string;
     createdAt: string;
-    createdBy: {
-      name: string;
-    };
+    createdBy: { name: string };
     price?: string;
   };
   status: string;
   createdAt: string;
-}[];
+};
+
+const statusVariant: Record<string, "success" | "info" | "destructive" | "soft"> = {
+  SHORTLISTED: "info",
+  APPLIED: "success",
+  REJECTED: "destructive",
+};
 
 export default function JobRow({ userId }: { userId: string }) {
-  const [applications, setApplications] = useState<JobRowProps>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       setLoading(true);
       const res = await getAppById(userId);
       if (res.status) {
-        // If successful, you can use the application data
         setApplications(res.app);
-        setLoading(false);
-
-        console.log(res.app);
-      } else {
-        console.error("Error fetching application:", res.message);
       }
+      setLoading(false);
     };
-    fetchUser();
+    fetchData();
   }, [userId]);
 
-  return (
-    <>
-      {loading ? (
-        <>
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <JobRowSkeleton key={idx} />
-          ))}
-        </>
-      ) : applications.length > 0 ? (
-        applications.map((app) => (
-          <tr key={app.id} className="border-b last:border-none">
-            <td className="px-6 py-4">
-              <div className="font-medium">{app.job.title}</div>
-              <div className="text-sm text-gray-500">
-                {app.job.createdBy.name}
-              </div>
-            </td>
-            <td className="px-6 py-4">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  app.status === "SHORTLISTED"
-                    ? "bg-green-100 text-green-700"
-                    : app.status === "APPLIED"
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {app.status}
-              </span>
-            </td>
-            <td className="px-6 py-4 text-gray-600">
-              {dayjs(app.createdAt).format("MMM DD, YYYY")}
-            </td>
-            <td className="px-6 py-4 font-semibold">
-              {app.job.price || "N/A"}
-            </td>
-          </tr>
-        ))
-      ) : (
-        <tr>
-          <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-            No applications found.
+  if (loading) {
+    return Array.from({ length: 4 }).map((_, i) => (
+      <tr key={i} className="border-b border-border last:border-0">
+        {Array.from({ length: 4 }).map((_, j) => (
+          <td key={j} className="px-4 py-3">
+            <div className="h-4 w-full max-w-[100px] rounded bg-muted animate-pulse-soft" />
           </td>
-        </tr>
-      )}
-    </>
-  );
+        ))}
+      </tr>
+    ));
+  }
+
+  if (applications.length === 0) {
+    return (
+      <tr>
+        <td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">
+          No applications found.
+        </td>
+      </tr>
+    );
+  }
+
+  return applications.map((app) => (
+    <tr key={app.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
+      <td className="px-4 py-3">
+        <p className="text-sm font-medium text-foreground">{app.job.title}</p>
+        <p className="text-xs text-muted-foreground">{app.job.createdBy.name}</p>
+      </td>
+      <td className="px-4 py-3">
+        <Badge variant={statusVariant[app.status] || "soft"} size="sm">
+          {app.status}
+        </Badge>
+      </td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">
+        {dayjs(app.createdAt).format("MMM DD, YYYY")}
+      </td>
+      <td className="px-4 py-3 text-sm font-medium text-foreground">
+        {app.job.price || "—"}
+      </td>
+    </tr>
+  ));
 }

@@ -2,46 +2,57 @@ import { Suspense } from "react";
 import JobCard from "./components/jobs/JobCard";
 import JobCardSkeleton from "./components/ui/JobCardSkeleton";
 import JobFilterPanel from "./components/jobs/JobFilterPanel";
+import HeroActions from "./components/home/HeroActions";
+import { Sparkles, Briefcase, Zap, Shield } from "lucide-react";
 
-interface JobsPageProps {
+interface HomeProps {
   searchParams: Promise<{ search?: string; skill?: string }>;
 }
 
-export default async function Home({ searchParams }: JobsPageProps) {
+export default async function Home({ searchParams }: HomeProps) {
   const { search, skill } = await searchParams;
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero Section */}
-      <div className="text-center mb-8 px-2">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
-          Welcome to TalentHub
-        </h1>
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-2">
-          Find Your Dream Job
-        </h2>
-        <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
-          Discover opportunities from top companies and take the next step in
-          your career journey.
-        </p>
-      </div>
-
-      {/* Filter Panel */}
-      <div className="mb-6 mx-auto ">
-        <JobFilterPanel />
-      </div>
-
-      {/* Job Listings */}
-      <Suspense
-        fallback={
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-2 sm:p-4">
-            {Array.from({ length: 4 }).map((_, idx) => (
-              <JobCardSkeleton key={idx} />
+    <div className="min-h-screen bg-surface">
+      <section className="border-b border-border bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-20 sm:py-24 text-center">
+          <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent ring-1 ring-accent/20">
+            <Sparkles size={22} />
+          </div>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-balance leading-[1.05] text-foreground">
+            Find your next opportunity
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Discover roles from top companies, apply with your AI-analyzed resume, and track every application.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {[
+              { icon: Briefcase, label: "500+ companies hiring" },
+              { icon: Zap, label: "AI-matched roles" },
+              { icon: Shield, label: "Free to apply" },
+            ].map((item) => (
+              <span key={item.label} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 px-3.5 py-1.5 text-xs font-medium text-muted-foreground">
+                <item.icon size={12} className="text-accent" />
+                {item.label}
+              </span>
             ))}
           </div>
-        }
-      >
-        <JobCard search={search} skill={skill} />
+        </div>
+      </section>
+
+      <Suspense fallback={null}>
+        <HeroActions />
       </Suspense>
+
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
+        <JobFilterPanel />
+        <Suspense fallback={
+          <div className="space-y-3">
+            {Array.from({ length: 6 }).map((_, idx) => (<JobCardSkeleton key={idx} />))}
+          </div>
+        }>
+          <JobCard search={search} skill={skill} />
+        </Suspense>
+      </section>
     </div>
   );
 }

@@ -1,28 +1,11 @@
-"use client";
-
 export default function JobRowSkeleton() {
   return (
-    <tr className="animate-pulse border-b last:border-none">
-      {/* Position + Company */}
-      <td className="px-6 py-4">
-        <div className="h-4 w-40 bg-gray-200 rounded mb-2"></div>
-        <div className="h-3 w-28 bg-gray-200 rounded"></div>
-      </td>
-
-      {/* Status */}
-      <td className="px-6 py-4">
-        <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
-      </td>
-
-      {/* Applied Date */}
-      <td className="px-6 py-4">
-        <div className="h-4 w-24 bg-gray-200 rounded"></div>
-      </td>
-
-      {/* Salary */}
-      <td className="px-6 py-4">
-        <div className="h-4 w-24 bg-gray-200 rounded"></div>
-      </td>
+    <tr className="border-b border-border last:border-0">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <td key={i} className="px-4 py-3">
+          <div className="h-4 w-full max-w-[100px] rounded bg-muted animate-pulse-soft" />
+        </td>
+      ))}
     </tr>
   );
 }
