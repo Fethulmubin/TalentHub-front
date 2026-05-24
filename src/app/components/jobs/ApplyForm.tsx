@@ -1,17 +1,17 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { Upload, Plus, FileIcon, X } from "lucide-react";
+import { Upload, Plus, FileText, X } from "lucide-react";
 import { ApplyForJob } from "@/app/lib/actions/App";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/system/button";
+import { Input } from "@/components/system/input";
+import { Badge } from "@/components/system/badge";
 import { toast } from "sonner";
-import { useMediaQuery } from "react-responsive";
 
 export default function ApplyForm({ jobId }: { jobId: string }) {
   const [skills, setSkills] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const isMobile = useMediaQuery({maxWidth: 640});
 
   const handleAddSkill = () => {
     if (input.trim() && !skills.includes(input.trim())) {
@@ -37,37 +37,29 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
 
   useEffect(() => {
     if (state?.status === true) {
-      toast.success("Application Submitted successfully!");
+      toast.success("Application submitted successfully!");
     } else if (state?.status === false && state?.message) {
       toast.error(state.message);
     }
   }, [state]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4 sm:p-6">
-      <form
-        action={action}
-        className={`bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full ${
-          isMobile ? "max-w-full" : "max-w-2xl"
-        }`}
-      >
-        <h1 className="text-2xl font-bold text-center mb-2">
-          Apply for Position
-        </h1>
-        <p className="text-gray-500 text-center mb-6 sm:mb-8">
-          Join our team of talented developers. Upload your resume and showcase
-          your skills.
-        </p>
-
-        {/* Resume Upload */}
-        <div className="mb-6">
-          <h2 className="font-semibold mb-2">Resume Upload</h2>
-          <label className="border-2 border-dashed rounded-xl p-4 sm:p-6 text-center cursor-pointer hover:border-blue-400 transition flex flex-col items-center">
-            <Upload className="mb-2 sm:mb-3 text-blue-500" size={32} />
-            <p className="text-gray-600 text-sm sm:text-base">
-              Drop your resume here or click to browse
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent/10 text-accent">
+          <FileText size={13} />
+        </div>
+        <p className="text-sm font-semibold">Apply for this position</p>
+      </div>
+      <form action={action} className="space-y-4">
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Resume (PDF)</p>
+          <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-surface/50 p-5 cursor-pointer hover:border-accent/40 hover:bg-accent/5 transition-all duration-150">
+            <Upload size={20} className="text-muted-foreground" />
+            <p className="text-xs text-muted-foreground">
+              {resumeFile ? resumeFile.name : "Drop your resume here or click to browse"}
             </p>
-            <p className="text-xs text-gray-400 mt-1">Only PDF (up to 5MB)</p>
+            <p className="text-[10px] text-muted-foreground">PDF only, up to 5MB</p>
             <input
               type="file"
               name="resume"
@@ -76,78 +68,69 @@ export default function ApplyForm({ jobId }: { jobId: string }) {
               className="hidden"
             />
           </label>
-          <input type="text" value={jobId} name="jobId" className="hidden" />
+          <input type="hidden" name="jobId" value={jobId} />
           {resumeFile && (
-            <span className="mt-2 flex items-center gap-2 text-sm">
-              <FileIcon className="text-blue-500" size={20} />
-              <span className="text-gray-700">{resumeFile.name}</span>
-              <X
-                className="ml-2 cursor-pointer text-red-500"
-                size={16}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-surface/50 rounded-lg px-3 py-2">
+              <FileText size={13} className="text-accent" />
+              <span className="truncate flex-1">{resumeFile.name}</span>
+              <button
+                type="button"
                 onClick={() => setResumeFile(null)}
-              />
-            </span>
+                className="text-muted-foreground hover:text-destructive transition-colors"
+                aria-label="Remove file"
+              >
+                <X size={13} />
+              </button>
+            </div>
           )}
         </div>
 
-        {/* Skills Input */}
-        <div className="mb-6">
-          <h2 className="font-semibold mb-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-500"></span> Technical
-            Skills
-          </h2>
-          <div className="flex flex-wrap gap-2 mb-3">
-            {skills.map((skill) => (
-              <span
-                key={skill}
-                className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2"
-              >
-                {skill}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSkill(skill)}
-                  className="text-gray-400 hover:text-red-500"
-                >
-                  ✕
-                </button>
-              </span>
-            ))}
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="text"
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Skills</p>
+          {skills.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {skills.map((skill) => (
+                <Badge key={skill} variant="soft" size="sm">
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+                    aria-label={`Remove ${skill}`}
+                  >
+                    <X size={10} />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Enter a skill (e.g., React, AWS)"
+              placeholder="Add a skill..."
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   handleAddSkill();
                 }
               }}
-              className="flex-1 border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            <button
-              type="button"
-              onClick={handleAddSkill}
-              className="bg-blue-500 text-white px-4 py-2 rounded-xl flex items-center gap-1 hover:bg-blue-600 transition"
-            >
-              <Plus size={16} /> Add
-            </button>
+            <Button type="button" variant="secondary" size="sm" onClick={handleAddSkill}>
+              <Plus size={14} />
+            </Button>
           </div>
         </div>
 
-        {/* Submit */}
-        <Button
-          type="submit"
-          disabled={isPending}
-          className={`w-full py-3 rounded-xl ${
-            isPending
-              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600"
-          }`}
-        >
+        {skills.map((skill, i) => (
+          <input key={i} type="hidden" name="skills" value={skill} />
+        ))}
+
+        {state?.status === false && state?.message && (
+          <p className="text-xs text-destructive">{state.message}</p>
+        )}
+
+        <Button type="submit" className="w-full" size="sm" loading={isPending}>
           {isPending ? "Submitting..." : "Submit Application"}
         </Button>
       </form>
