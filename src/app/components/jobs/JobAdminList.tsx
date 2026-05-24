@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import JobRowSkeleton from "../ui/JobRowSkeleton";
 import { getJobByUserId } from "@/app/lib/actions/Job";
-import { useMediaQuery } from "react-responsive";
+import { DataGrid, Column } from "@/components/system/data-grid";
+import { Badge } from "@/components/system/badge";
+import { Button } from "@/components/system/button";
+import { EmptyState } from "@/components/system/empty-state";
+import { Briefcase } from "lucide-react";
 
 type Job = {
   id: string;
@@ -17,108 +20,105 @@ type Job = {
 
 export default function JobList({ userId }: { userId: string }) {
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const isMobile = useMediaQuery({ maxWidth: 640 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getJobByUserId(userId);
+      if (res.status) {
+        setJobs(res.jobs);
+      } else {
+        setError(res.message || "Failed to fetch jobs");
+      }
+    } catch {
+      setError("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      const res = await getJobByUserId(userId);
-      if (res.status) setJobs(res.jobs);
-      setLoading(false);
-    };
-    fetchUser();
+    fetchData();
   }, [userId]);
 
-  if (loading) return <JobRowSkeleton />;
-  if (!jobs.length)
-    return <p className="text-gray-500">You haven’t posted any jobs yet.</p>;
+  const columns: Column<Job>[] = [
+    {
+      key: "title",
+      header: "Title",
+      sortable: true,
+      render: (job) => (
+        <div>
+          <span className="font-medium text-sm">{job.title}</span>
+        </div>
+      ),
+    },
+    {
+      key: "skills",
+      header: "Skills",
+      render: (job) => (
+        <div className="flex flex-wrap gap-1">
+          {job.skills.length > 0
+            ? job.skills.slice(0, 3).map((s) => (
+                <Badge key={s.id} variant="soft" size="sm">
+                  {s.name}
+                </Badge>
+              ))
+            : <span className="text-xs text-muted-foreground">—</span>}
+        </div>
+      ),
+    },
+    {
+      key: "price",
+      header: "Salary",
+      sortable: true,
+      render: (job) => (
+        <span className="text-sm text-muted-foreground tabular-nums">{job.price ? `$${Number(job.price).toLocaleString()}` : "—"}</span>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "Created",
+      sortable: true,
+      render: (job) => (
+        <span className="text-sm text-muted-foreground">
+          {new Date(job.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (job) => (
+        <div className="flex items-center gap-2">
+          <Link href={`/admin/${userId}/apps/${job.id}`}>
+            <Button variant="ghost" size="xs">
+              Apps
+            </Button>
+          </Link>
+        </div>
+      ),
+    },
+  ];
 
-  if (isMobile) {
-    return (
-      <div className="flex flex-col gap-4">
-        {jobs.map((job) => (
-          <div key={job.id} className="bg-white p-4 rounded-xl shadow">
-            <h3 className="font-medium text-lg">{job.title}</h3>
-            <p className="text-gray-500 text-sm mt-1">
-              Created: {new Date(job.createdAt).toLocaleDateString()}
-            </p>
-            <p className="text-gray-500 text-sm mt-1">
-              Price: {job.price ? `$${job.price}` : "N/A"}
-            </p>
-            <div className="flex flex-wrap gap-1 mt-2">
-              {job.skills.length
-                ? job.skills.map((s) => (
-                    <span
-                      key={s.id}
-                      className="bg-indigo-100 text-indigo-600 text-xs px-2 py-1 rounded-full"
-                    >
-                      {s.name}
-                    </span>
-                  ))
-                : <span className="text-gray-400 text-xs">No skills</span>}
-            </div>
-            <Link
-              href={`/admin/${userId}/apps/${job.id}`}
-              className="inline-block bg-indigo-600 text-white px-3 py-1 mt-3 rounded-lg text-sm hover:bg-indigo-700 transition"
-            >
-              Show Applications
-            </Link>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // Default table for desktop
   return (
-    <div className="overflow-x-auto bg-white shadow rounded-xl p-4">
-      <table className="min-w-[600px] sm:min-w-full w-full">
-        <thead className="bg-indigo-600 text-white text-sm sm:text-base">
-          <tr>
-            <th className="py-2 sm:py-3 px-2 sm:px-4 text-left">Title</th>
-            <th className="py-2 sm:py-3 px-2 sm:px-4 text-left">Skills</th>
-            <th className="py-2 sm:py-3 px-2 sm:px-4 text-left">Price</th>
-            <th className="py-2 sm:py-3 px-2 sm:px-4 text-left">Created</th>
-            <th className="py-2 sm:py-3 px-2 sm:px-4 text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {jobs.map((job) => (
-            <tr key={job.id} className="border-b hover:bg-gray-50 transition">
-              <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium">{job.title}</td>
-              <td className="py-2 sm:py-3 px-2 sm:px-4">
-                {job.skills.length > 0 ? (
-                  <div className="flex flex-wrap gap-1 sm:gap-2">
-                    {job.skills.map((s) => (
-                      <span
-                        key={s.id}
-                        className="bg-indigo-100 text-indigo-600 text-xs sm:text-sm px-2 py-1 rounded-full"
-                      >
-                        {s.name}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-gray-400 text-xs sm:text-sm">No skills</span>
-                )}
-              </td>
-              <td className="py-2 sm:py-3 px-2 sm:px-4">{job.price ? `$${job.price}` : "N/A"}</td>
-              <td className="py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base text-gray-500">
-                {new Date(job.createdAt).toLocaleDateString()}
-              </td>
-              <td className="py-2 sm:py-3 px-2 sm:px-4 text-center">
-                <Link
-                  href={`/admin/${userId}/apps/${job.id}`}
-                  className="inline-block bg-indigo-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg hover:bg-indigo-700 transition text-xs sm:text-sm"
-                >
-                  Show Applications
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataGrid
+      columns={columns}
+      data={jobs}
+      keyExtractor={(job) => job.id}
+      loading={loading}
+      error={error}
+      onRetry={fetchData}
+      emptyState={
+        <EmptyState
+          icon={<Briefcase size={24} />}
+          title="No jobs posted yet"
+          description="Create your first job posting to attract candidates."
+          action={{ label: "Post a Job", onClick: () => window.location.href = `/admin/${userId}/jobs/post` }}
+        />
+      }
+    />
   );
 }
