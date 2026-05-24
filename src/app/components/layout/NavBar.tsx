@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User, ChevronDown, X } from "lucide-react";
+import { Menu, User, X, LayoutDashboard, Upload, FileText, Bell } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import { Logout } from "@/app/lib/actions/Auth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/system/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
@@ -13,9 +13,8 @@ export default function NavBar() {
   const { user, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -35,11 +34,9 @@ export default function NavBar() {
     }
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false);
       }
     }
@@ -47,90 +44,124 @@ export default function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const isApplicant = user?.role === "APPLICANT";
+  const isEmployer = user?.role === "EMPLOYER";
+
   return (
-    <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 border-b border-gray-200 dark:border-gray-600">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse"
-        >
-          <Image
-            src="/talent.png"
-            width={36}
-            height={36}
-            alt="TalentHub Logo"
-            className="w-8 h-8 sm:w-10 sm:h-10"
-          />
-          <span className="self-center text-lg sm:text-xl font-semibold whitespace-nowrap dark:text-white">
-            TalentHub
-          </span>
+    <header className="fixed top-0 left-0 right-0 z-sticky h-14 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-full max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image src="/talent.png" width={28} height={28} alt="TalentHub" className="h-7 w-7" />
+          <span className="text-sm font-semibold tracking-tight">TalentHub</span>
         </Link>
 
-        {/* Desktop User Actions */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center gap-2">
           {user ? (
-            <div className="flex items-center gap-3">
-              <User />
-              <span className="text-gray-800 dark:text-gray-200 font-medium truncate max-w-[140px]">
-                {user.email.split("@")[0]}
+            <>
+              <span className="flex items-center gap-1.5 text-sm text-muted-foreground mr-1">
+                <User size={13} />
+                <span className="max-w-[120px] truncate">{user.email.split("@")[0]}</span>
               </span>
-              <Button
-                disabled={loading}
-                onClick={handleLogout}
-                className="bg-red-400 hover:bg-red-500 text-white"
+
+              {isApplicant && (
+                <>
+                  <Link href="/resume/upload" className="inline-flex h-8 items-center rounded-lg border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                    <Upload size={12} className="mr-1" />
+                    Upload Resume
+                  </Link>
+                  <Link href={`/apps/${user.id}`} className="inline-flex h-8 items-center rounded-lg border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                    My Apps
+                  </Link>
+                </>
+              )}
+
+              {isEmployer && (
+                <Link href={`/admin/${user.id}`} className="inline-flex h-8 items-center rounded-lg border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  <LayoutDashboard size={12} className="mr-1" />
+                  Dashboard
+                </Link>
+              )}
+
+              <button
+                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                aria-label="Notifications"
               >
+                <Bell size={15} />
+                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-destructive ring-1 ring-background" />
+              </button>
+
+              <Button variant="ghost" size="sm" loading={loading} onClick={handleLogout} className="text-muted-foreground">
                 {loading ? "Logging out..." : "Logout"}
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Link href={`/apps/${user.id}`}>Track Apps</Link>
-              </Button>
-            </div>
+            </>
           ) : (
-            <Link
-              href="/auth/signIn"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none 
-                         focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 
-                         dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Get Started
+            <Link href="/auth/signIn" className="inline-flex h-8 items-center rounded-lg bg-primary px-3.5 text-xs font-medium text-primary-foreground hover:bg-primary-hover transition-colors shadow-xs">
+              Sign In
             </Link>
           )}
         </div>
 
-        {/* Mobile menu button */}
-        <div className="md:hidden relative" ref={dropdownRef}>
+        <div className="md:hidden" ref={menuRef}>
           <button
             type="button"
-            className="inline-flex items-center p-2 w-9 h-9 sm:w-10 sm:h-10 justify-center text-sm text-gray-500 
-                       rounded-lg hover:bg-gray-100 focus:outline-none 
-                       focus:ring-2 focus:ring-gray-200 dark:text-gray-400 
-                       dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {user && (
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-destructive ring-1 ring-background" />
+            )}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
 
-          {/* Mobile Dropdown Menu */}
-          {mobileMenuOpen && user && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden z-50">
-              <button
-                onClick={handleLogout}
-                disabled={loading}
-                className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-gray-700"
-              >
-                {loading ? "Logging out..." : "Logout"}
-              </button>
-              <Link
-                href={`/apps/${user.id}`}
-                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                Track Apps
-              </Link>
+          {mobileMenuOpen && (
+            <div className="absolute right-4 top-12 w-56 rounded-xl border border-border/60 bg-popover p-1.5 shadow-lg animate-scale-in">
+              {user ? (
+                <div className="space-y-0.5">
+                  <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-border/40 mb-1">{user.email}</div>
+
+                  {isApplicant && (
+                    <>
+                      <Link href="/resume/upload" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                        <Upload size={14} />
+                        Upload Resume
+                      </Link>
+                      <Link href={`/apps/${user.id}`} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                        <FileText size={14} />
+                        My Apps
+                      </Link>
+                    </>
+                  )}
+
+                  {isEmployer && (
+                    <Link href={`/admin/${user.id}`} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <LayoutDashboard size={14} />
+                      Dashboard
+                    </Link>
+                  )}
+
+                  <hr className="border-border/40 my-1" />
+
+                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} disabled={loading}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <svg className="h-4 w-4" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.5 2.5L4.5 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M9.5 4.5L12.5 7.5L9.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M12.5 7.5L4.5 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    {loading ? "Logging out..." : "Sign Out"}
+                  </button>
+                </div>
+              ) : (
+                <Link href="/auth/signIn" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                  Get Started
+                </Link>
+              )}
             </div>
           )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }
